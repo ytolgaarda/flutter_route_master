@@ -1,0 +1,2 @@
+//
+enum RouterType { native, goRouter }
