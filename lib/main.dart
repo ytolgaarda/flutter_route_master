@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:route_master/dependency_injection.dart';
-import 'package:route_master/presentation/account_view.dart';
+import 'package:route_master/router/enum/router_type.dart';
 
-import 'router/enum/router_type.dart';
-import 'router/route_master.dart';
+import 'router/manager/route_manager.dart';
 
 void main() {
-  setupServiceLocator();
-
+  registerRouter();
+  sl<RouterManager>().setStrategy(RouterType.goRouter);
   runApp(const MyApp());
 }
 
@@ -17,38 +15,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    sl<RouteMaster>().setRouterStrategy(routerType: RouterType.native);
-
-    final GoRouter goRouter = GoRouter(
-      routes: [
-        GoRoute(
-          name: '/',
-          path: '/',
-          builder: (context, state) {
-            final title = state.pathParameters['title'] ?? 'Default Title';
-            return MyHomePage(title: title);
-          },
-        ),
-        GoRoute(
-          name: 'account',
-          path: '/account',
-          builder: (context, state) {
-            final name = state.extra as String;
-            return AccountView(name: name);
-          },
-        ),
-      ],
-    );
-    return MaterialApp.router(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      routerConfig: goRouter,
-
-      /// TODO ! burada ongenarateroutes olcak. ve bir üst widget adaptive hale getirilecek...
-    );
+    return sl<RouterManager>().buildRouter;
   }
 }
 
@@ -72,6 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var routeManager = sl<RouterManager>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -91,8 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(height: 8),
             ElevatedButton(
                 onPressed: () {
-                  sl<RouteMaster>()
-                      .pushNamed(context, 'account', args: 'Tolgaa');
+                  routeManager.push(context, '/account', args: 'Tolga');
                 },
                 child: Text('go to account page')),
           ],
